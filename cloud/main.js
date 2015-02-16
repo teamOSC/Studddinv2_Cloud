@@ -262,3 +262,32 @@ app.get('/authorize', function(req, res) {
   });
  
 });
+
+
+//#######################################################################################################################################//
+//Feed Code
+Parse.Cloud.define("feed", function(request, response) {
+    var Feed = Parse.Object.extend("Feed");
+    Parse.Cloud.useMasterKey();
+    var userObjectId = request.params.userObjectId;
+    var query = new Parse.Query(Parse.User);
+    query.equalTo("objectId", userObjectId);
+    query.find({
+        success : function(result) {
+            var interests = result[0].get("interests");
+            var feedQuery = new Parse.Query(Feed);
+            feedQuery.equalTo("category", interests);
+            feedQuery.find({
+                success : function(result) {
+                    //TODO: apply maths
+                },
+                error : function(error) {
+                    response.error(error);
+                }
+            })
+        },
+        error : function(error) {
+            response.error(error);
+        }
+    });
+});
